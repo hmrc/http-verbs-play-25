@@ -22,8 +22,7 @@ import org.apache.commons.lang3.time.FastDateFormat
 import org.joda.time.DateTimeUtils
 import play.api.mvc.{Filter, RequestHeader, Result}
 import play.api.{Logger, LoggerLike}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.logging.LoggingDetails
+import uk.gov.hmrc.http.{HeaderCarrier, LoggingDetails}
 //import MdcLoggingExecutionContext._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import uk.gov.hmrc.play.HeaderCarrierConverter

@@ -18,7 +18,7 @@ package uk.gov.hmrc.play.http.logging
 
 import org.slf4j.MDC
 import play.api.libs.concurrent.Execution.defaultContext
-import uk.gov.hmrc.http.logging.LoggingDetails
+import uk.gov.hmrc.http.LoggingDetails
 
 import scala.concurrent.ExecutionContext
 

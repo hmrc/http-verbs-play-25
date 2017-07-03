@@ -17,11 +17,9 @@
 package uk.gov.hmrc.play.connectors
 
 import org.scalatest.{Matchers, WordSpecLike}
-
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{Token, HeaderCarrier, HeaderNames}
-import uk.gov.hmrc.http.logging.{Authorization, ForwardedFor, RequestId, SessionId}
+import uk.gov.hmrc.http._
 
 class ConnectorSpec extends WordSpecLike with Matchers {
   class TestConfig(val builderName: String, val builder: RequestBuilder, setupFunc:((=> Any) => Any)) {
