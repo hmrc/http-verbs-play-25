@@ -17,14 +17,12 @@
 package uk.gov.hmrc.play.http.ws
 
 import play.api.libs.json.Writes
-import uk.gov.hmrc.http.{CoreGet, HeaderCarrier}
-import uk.gov.hmrc.http.HttpVerbs.{GET => GET_VERB, PATCH => PATCH_VERB, POST => POST_VERB, PUT => PUT_VERB}
-import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.HttpVerbs.{DELETE => DELETE_VERB, GET => GET_VERB, PATCH => PATCH_VERB, POST => POST_VERB, PUT => PUT_VERB}
+import uk.gov.hmrc.http.{CoreGet, HeaderCarrier, _}
 import uk.gov.hmrc.play.http.HttpReads
 
 import scala.concurrent.Future
 
-//import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 
@@ -52,6 +50,13 @@ object WSExtensions {
     @deprecated("clients are encouraged to use the uk.gov.hmrc.play.http.CorePut.patch instead and do their own Reads")
     def PUT[I, O](url: String, body: I)(implicit wts: Writes[I], rds: HttpReads[O], hc: HeaderCarrier): Future[O] = {
       corePut.put(url, body).map(response => rds.read(PUT_VERB, url, response))
+    }
+  }
+
+  implicit class ExtendCoreDelete(coreDelete: CoreDelete) {
+    @deprecated("clients are encouraged to use the uk.gov.hmrc.play.http.CorePut.delete instead and do their own Reads")
+    def DELETE[O](url: String)(implicit rds: HttpReads[O], hc: HeaderCarrier): Future[O] = {
+      coreDelete.delete(url).map(response => rds.read(DELETE_VERB, url, response))
     }
   }
 
