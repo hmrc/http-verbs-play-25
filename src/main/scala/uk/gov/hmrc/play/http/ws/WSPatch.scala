@@ -17,11 +17,11 @@
 package uk.gov.hmrc.play.http.ws
 
 import play.api.libs.json.{Json, Writes}
-import uk.gov.hmrc.http.{CorePatch, HeaderCarrier, HttpResponse, HttpTransport}
+import uk.gov.hmrc.http._
 
 import scala.concurrent.Future
 
-trait WSPatch extends CorePatch with HttpTransport with WSRequest {
+trait WSPatch extends CorePatch with PatchHttpTransport with WSRequest {
 
   override def doPatch[A](url: String, body: A)(implicit rds: Writes[A], hc: HeaderCarrier): Future[HttpResponse] = {
     import play.api.libs.concurrent.Execution.Implicits.defaultContext

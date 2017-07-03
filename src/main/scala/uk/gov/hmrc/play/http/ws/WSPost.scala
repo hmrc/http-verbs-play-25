@@ -18,12 +18,12 @@ package uk.gov.hmrc.play.http.ws
 
 import play.api.libs.json.{Json, Writes}
 import play.api.mvc.Results
-import uk.gov.hmrc.http.{CorePost, HeaderCarrier, HttpResponse, HttpTransport}
+import uk.gov.hmrc.http._
 
 import scala.concurrent.Future
 
 
-trait WSPost extends CorePost with HttpTransport with WSRequest {
+trait WSPost extends CorePost with PostHttpTransport with WSRequest {
 
 
   override def doPost[A](url: String, body: A, headers: Seq[(String,String)])(implicit rds: Writes[A], hc: HeaderCarrier): Future[HttpResponse] = {

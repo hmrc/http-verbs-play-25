@@ -16,12 +16,11 @@
 
 package uk.gov.hmrc.play.http.ws
 
-import uk.gov.hmrc.http.{CoreDelete, HeaderCarrier, HttpResponse, HttpTransport}
-import uk.gov.hmrc.http.HttpVerbs.{DELETE => DELETE_VERB}
+import uk.gov.hmrc.http._
 
 import scala.concurrent.Future
 
-trait WSDelete extends CoreDelete with HttpTransport with WSRequest {
+trait WSDelete extends CoreDelete with DeleteHttpTransport with WSRequest {
 
 
  override def doDelete(url: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
