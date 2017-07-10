@@ -33,21 +33,24 @@ object HmrcBuild extends Build {
       resolvers := Seq(
         Resolver.bintrayRepo("hmrc", "releases"),
         "typesafe-releases" at "http://repo.typesafe.com/typesafe/releases/"
-      )
+      ),
+      version := "100.0-SNAPSHOT"
     )
 }
 
 private object AppDependencies {
 
+  import play.sbt.PlayImport._
+  import play.core.PlayVersion
 
-  private val playVersion = "2.5.15"
+//  private val playVersion = "2.5.15"
 
   val compile = Seq(
-    "com.typesafe.play" %% "play-ws" % playVersion,
-    "com.typesafe.play" %% "play-json" % playVersion,
+    "com.typesafe.play" %% "play" % PlayVersion.current,
+    ws,
     "uk.gov.hmrc" %% "time" % "2.0.0",
     "uk.gov.hmrc" %% "http-exceptions" % "1.0.0",
-    "uk.gov.hmrc" %% "http-core" % "0.4.0"
+    "uk.gov.hmrc" %% "http-core" % "100.0-SNAPSHOT"
   )
 
 
@@ -61,8 +64,8 @@ private object AppDependencies {
   object Test {
     def apply() = new TestDependencies {
       override lazy val test = Seq(
-        "com.typesafe.play" % "play-test_2.11" % playVersion % scope,
-        "com.typesafe.play" % "play-specs2_2.11" % playVersion % scope,
+        "com.typesafe.play" % "play-test_2.11" %  PlayVersion.current % scope,
+        "com.typesafe.play" % "play-specs2_2.11" %  PlayVersion.current % scope,
         "commons-codec" % "commons-codec" % "1.7" % scope,
         "org.scalatest" %% "scalatest" % "2.2.4" % scope,
         "org.scalacheck" %% "scalacheck" % "1.12.2" % scope,
