@@ -34,6 +34,7 @@ object WSExtensions {
       coreGet.get(url).map(response => rds.read(GET_VERB, url, response))
     }
 
+    @deprecated("clients are encouraged to use the @see uk.gov.hmrc.play.http.CoreGet#get instead and do their own Reads")
     def GET[A](url: String, queryParams: Seq[(String, String)])(implicit rds: HttpReads[A], hc: HeaderCarrier): Future[A] = {
       coreGet.get(url, queryParams).map(response => rds.read(GET_VERB, url, response))
     }
