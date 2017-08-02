@@ -24,16 +24,12 @@ import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import org.webbitserver.handler.{DelayedHttpHandler, StringHttpHandler}
 import org.webbitserver.netty.NettyWebServer
 import play.api.Play
-import play.api.libs.json.Writes
 import play.api.test.FakeApplication
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.ws.WSHttp
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import uk.gov.hmrc.play.http.ws.WSExtensions._
 import uk.gov.hmrc.play.test.TestHttpCore
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class HttpTimeoutSpec extends WordSpecLike with Matchers with ScalaFutures with BeforeAndAfterAll {
 
