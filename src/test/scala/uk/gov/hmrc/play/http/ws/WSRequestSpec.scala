@@ -20,6 +20,7 @@ import org.scalatest.{Matchers, WordSpecLike}
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.logging.{Authorization, ForwardedFor, RequestId, SessionId}
 
 class WSRequestSpec extends WordSpecLike with Matchers {
 
