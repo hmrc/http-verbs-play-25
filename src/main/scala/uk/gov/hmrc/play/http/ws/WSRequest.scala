@@ -16,42 +16,23 @@
 
 package uk.gov.hmrc.play.http.ws
 
-import java.net.URL
-
+import com.typesafe.config.{Config, ConfigFactory}
 import play.api.Play
 import play.api.libs.ws
 import play.api.libs.ws.{DefaultWSProxyServer, WSProxyServer}
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, Request}
 
-import scala.util.matching.Regex
-
-trait WSRequest {
+trait WSRequest extends Request {
 
   import play.api.Play.current
   import play.api.libs.ws.WS
 
-  private val internalHostPatterns: Seq[Regex] = Play.maybeApplication.flatMap(
-    _.configuration.getStringSeq("internalServiceHostPatterns").
-      map(_.map(_.r))
-  ).getOrElse(Seq("^.*\\.service$".r))
+  override lazy val configuration: Option[Config] = Play.maybeApplication.map(_.configuration.underlying)
 
   def buildRequest[A](url: String)(implicit hc: HeaderCarrier): ws.WSRequest = {
-    val agentHeader = Play.maybeApplication
-      .flatMap(_.configuration.getString("appName"))
-      .map(name => "User-Agent" -> name)
-      .toList
-
-    WS.url(url).withHeaders(agentHeader ++ otherHeaders(url, hc): _*)
+    WS.url(url).withHeaders(applicableHeaders(url)(hc): _*)
   }
 
-  private def otherHeaders(url: String, hc: HeaderCarrier): Seq[(String, String)] = {
-    val u = new URL(url)
-    if (internalHostPatterns.exists(_.pattern.matcher(u.getHost).matches())) {
-      hc.headers
-    } else {
-      hc.headers.filterNot(hc.otherHeaders.contains(_))
-    }
-  }
 }
 
 

@@ -36,6 +36,9 @@ class WsProxySpec extends WordSpecLike with Matchers with MockitoSugar with Opti
       val wSProxyServer = mock[WSProxyServer]
       
       object ProxiedGet extends WSProxy {
+
+        override def applicableHeaders(url: String)(implicit hc: HeaderCarrier): Seq[(String, String)] = Nil
+
         def wsProxyServer = Some(wSProxyServer)
       }
 
@@ -49,6 +52,9 @@ class WsProxySpec extends WordSpecLike with Matchers with MockitoSugar with Opti
     "still work by making the request without using a proxy server" in new Setup {
 
       object ProxiedGet extends WSProxy {
+
+        override def applicableHeaders(url: String)(implicit hc: HeaderCarrier): Seq[(String, String)] = Nil
+
         def wsProxyServer = None
       }
 
