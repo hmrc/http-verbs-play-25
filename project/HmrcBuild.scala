@@ -48,7 +48,7 @@ private object AppDependencies {
     "com.typesafe.play" %% "play" % PlayVersion.current,
     ws,
     "uk.gov.hmrc" %% "time" % "2.0.0",
-    "uk.gov.hmrc" %% "http-core" % "100.0-SNAPSHOT"
+    "uk.gov.hmrc" %% "http-core" % "0.5.0"
   )
 
 
