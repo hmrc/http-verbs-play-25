@@ -16,21 +16,25 @@
 
 package uk.gov.hmrc.play.http.ws
 
-import com.typesafe.config.{Config, ConfigFactory}
-import play.api.Play
+import com.typesafe.config.Config
+import play.api.{Configuration, Play}
 import play.api.libs.ws
-import play.api.libs.ws.{DefaultWSProxyServer, WSProxyServer}
+import play.api.libs.ws.{DefaultWSProxyServer, WSClient, WSProxyServer}
 import uk.gov.hmrc.http.{HeaderCarrier, Request}
 
 trait WSRequest extends Request {
 
-  import play.api.Play.current
   import play.api.libs.ws.WS
 
   override lazy val configuration: Option[Config] = Play.maybeApplication.map(_.configuration.underlying)
 
+  lazy val wsClient: WSClient = {
+    import play.api.Play.current
+    WS.client
+  }
+
   def buildRequest[A](url: String)(implicit hc: HeaderCarrier): ws.WSRequest = {
-    WS.url(url).withHeaders(applicableHeaders(url)(hc): _*)
+    wsClient.url(url).withHeaders(applicableHeaders(url)(hc): _*)
   }
 
 }
@@ -50,22 +54,26 @@ trait WSProxy extends WSRequest {
 
 object WSProxyConfiguration {
 
-  import play.api.Play.current
+  def apply(configPrefix: String, configuration: Configuration): Option[WSProxyServer] = {
+    val proxyRequired = configuration.getBoolean(s"$configPrefix.proxyRequiredForThisEnvironment").getOrElse(true)
+
+    if (proxyRequired) Some(parseProxyConfiguration(configPrefix, configuration)) else None
+  }
 
   def apply(configPrefix: String): Option[WSProxyServer] = {
 
-    val proxyRequired = Play.configuration.getBoolean(s"$configPrefix.proxyRequiredForThisEnvironment").getOrElse(true)
+    import play.api.Play.current
+    apply(configPrefix, Play.configuration)
 
-    if (proxyRequired) Some(parseProxyConfiguration(configPrefix)) else None
   }
 
-  private def parseProxyConfiguration(configPrefix: String) = {
+  private def parseProxyConfiguration(configPrefix: String, configuration: Configuration) = {
     DefaultWSProxyServer(
-      protocol = Play.configuration.getString(s"$configPrefix.protocol").orElse(throw ProxyConfigurationException("protocol")),
-      host = Play.configuration.getString(s"$configPrefix.host").getOrElse(throw ProxyConfigurationException("host")),
-      port = Play.configuration.getInt(s"$configPrefix.port").getOrElse(throw ProxyConfigurationException("port")),
-      principal = Play.configuration.getString(s"$configPrefix.username"),
-      password = Play.configuration.getString(s"$configPrefix.password")
+      protocol = configuration.getString(s"$configPrefix.protocol").orElse(throw ProxyConfigurationException("protocol")),
+      host = configuration.getString(s"$configPrefix.host").getOrElse(throw ProxyConfigurationException("host")),
+      port = configuration.getInt(s"$configPrefix.port").getOrElse(throw ProxyConfigurationException("port")),
+      principal = configuration.getString(s"$configPrefix.username"),
+      password = configuration.getString(s"$configPrefix.password")
     )
   }
 
