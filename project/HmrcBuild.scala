@@ -48,7 +48,9 @@ private object AppDependencies {
     "com.typesafe.play" %% "play" % PlayVersion.current,
     ws,
     "uk.gov.hmrc" %% "time" % "2.0.0",
-    "uk.gov.hmrc" %% "http-core" % "0.5.0"
+    "uk.gov.hmrc" %% "http-core" % "0.7.0",
+    "ch.qos.logback" % "logback-core" % "1.1.7",
+    "ch.qos.logback" % "logback-classic" % "1.1.7"
   )
 
 
@@ -69,9 +71,7 @@ private object AppDependencies {
         "org.scalacheck" %% "scalacheck" % "1.12.2" % scope,
         "org.pegdown" % "pegdown" % "1.5.0" % scope,
         "com.github.tomakehurst" % "wiremock" % "1.52" % scope,
-        "uk.gov.hmrc" %% "http-verbs-test" % "1.1.0" % scope,
-        "ch.qos.logback" % "logback-core" % "1.1.7",
-        "ch.qos.logback" % "logback-classic" % "1.1.7"
+        "uk.gov.hmrc" %% "http-verbs-test" % "1.1.0" % scope
       )
     }.test
   }
