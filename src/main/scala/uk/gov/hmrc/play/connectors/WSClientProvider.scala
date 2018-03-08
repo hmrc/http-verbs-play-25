@@ -26,11 +26,11 @@ trait WSClientProvider {
 }
 
 trait DefaultWSClientProvider extends WSClientProvider {
-  val builder = new AhcConfigBuilder()
+  val builder    = new AhcConfigBuilder()
   val ahcBuilder = builder.configure()
-  val ahcConfig = ahcBuilder.build()
+  val ahcConfig  = ahcBuilder.build()
 
-  implicit val system = ActorSystem()
+  implicit val system       = ActorSystem()
   implicit val materializer = ActorMaterializer()
 
   implicit val client = new AhcWSClient(ahcConfig)

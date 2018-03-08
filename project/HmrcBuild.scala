@@ -47,33 +47,31 @@ private object AppDependencies {
   val compile = Seq(
     "com.typesafe.play" %% "play" % PlayVersion.current,
     ws,
-    "uk.gov.hmrc" %% "time" % "2.0.0",
-    "uk.gov.hmrc" %% "http-core" % "0.7.0",
-    "ch.qos.logback" % "logback-core" % "1.1.7",
+    "uk.gov.hmrc"    %% "time"           % "2.0.0",
+    "uk.gov.hmrc"    %% "http-core"      % "0.7.0",
+    "ch.qos.logback" % "logback-core"    % "1.1.7",
     "ch.qos.logback" % "logback-classic" % "1.1.7"
   )
 
-
   trait TestDependencies {
-    lazy val scope: String = "test"
+    lazy val scope: String       = "test"
     lazy val test: Seq[ModuleID] = ???
   }
 
-
-
   object Test {
-    def apply() = new TestDependencies {
-      override lazy val test = Seq(
-        "com.typesafe.play" % "play-test_2.11" %  PlayVersion.current % scope,
-        "com.typesafe.play" % "play-specs2_2.11" %  PlayVersion.current % scope,
-        "commons-codec" % "commons-codec" % "1.7" % scope,
-        "org.scalatest" %% "scalatest" % "2.2.4" % scope,
-        "org.scalacheck" %% "scalacheck" % "1.12.2" % scope,
-        "org.pegdown" % "pegdown" % "1.5.0" % scope,
-        "com.github.tomakehurst" % "wiremock" % "1.52" % scope,
-        "uk.gov.hmrc" %% "http-verbs-test" % "1.1.0" % scope
-      )
-    }.test
+    def apply() =
+      new TestDependencies {
+        override lazy val test = Seq(
+          "com.typesafe.play"      % "play-test_2.11"   % PlayVersion.current % scope,
+          "com.typesafe.play"      % "play-specs2_2.11" % PlayVersion.current % scope,
+          "commons-codec"          % "commons-codec"    % "1.7"               % scope,
+          "org.scalatest"          %% "scalatest"       % "2.2.4"             % scope,
+          "org.scalacheck"         %% "scalacheck"      % "1.12.2"            % scope,
+          "org.pegdown"            % "pegdown"          % "1.5.0"             % scope,
+          "com.github.tomakehurst" % "wiremock"         % "1.52"              % scope,
+          "uk.gov.hmrc"            %% "http-verbs-test" % "1.1.0"             % scope
+        )
+      }.test
   }
 
   def apply() = compile ++ Test()

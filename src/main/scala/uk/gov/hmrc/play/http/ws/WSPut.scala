@@ -26,6 +26,6 @@ trait WSPut extends CorePut with PutHttpTransport with WSRequest {
   override def doPut[A](url: String, body: A)(implicit rds: Writes[A], hc: HeaderCarrier): Future[HttpResponse] = {
     import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-    buildRequest(url).put(Json.toJson(body)).map (new WSHttpResponse(_))
+    buildRequest(url).put(Json.toJson(body)).map(new WSHttpResponse(_))
   }
 }

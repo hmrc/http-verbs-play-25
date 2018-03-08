@@ -40,8 +40,7 @@ class MdcLoggingExecutionContext(wrapped: ExecutionContext, mdcData: Map[String,
       }
       try {
         runnable.run()
-      }
-      finally {
+      } finally {
         MDC.clear()
       }
     }

@@ -34,7 +34,7 @@ class WsProxySpec extends WordSpecLike with Matchers with MockitoSugar with Opti
     "correctly make a request via the specified proxy server" in new Setup {
 
       val wSProxyServer = mock[WSProxyServer]
-      
+
       object ProxiedGet extends WSProxy {
 
         override def applicableHeaders(url: String)(implicit hc: HeaderCarrier): Seq[(String, String)] = Nil
@@ -44,7 +44,7 @@ class WsProxySpec extends WordSpecLike with Matchers with MockitoSugar with Opti
 
       val request = ProxiedGet.buildRequest("http://example.com")
 
-      request.proxyServer.value shouldBe(wSProxyServer)
+      request.proxyServer.value shouldBe (wSProxyServer)
     }
   }
 
@@ -60,10 +60,9 @@ class WsProxySpec extends WordSpecLike with Matchers with MockitoSugar with Opti
 
       val request = ProxiedGet.buildRequest("http://example.com")
 
-      request.proxyServer shouldBe(None)
+      request.proxyServer shouldBe (None)
     }
   }
-
 
   class Setup extends WireMockEndpoints {
 
@@ -75,13 +74,16 @@ class WsProxySpec extends WordSpecLike with Matchers with MockitoSugar with Opti
     def fullResourceUrl = s"$endpointBaseUrl$resourcePath"
 
     def setupEndpointExpectations() {
-      endpointMock.register(get(urlEqualTo(resourcePath))
-        .willReturn(aResponse()
-        .withHeader("Content-Type", "text/plain")
-        .withBody(responseData)))
+      endpointMock.register(
+        get(urlEqualTo(resourcePath))
+          .willReturn(
+            aResponse()
+              .withHeader("Content-Type", "text/plain")
+              .withBody(responseData)))
 
-      proxyMock.register(get(urlMatching(resourcePath))
-        .willReturn(aResponse().proxiedFrom(endpointBaseUrl)))
+      proxyMock.register(
+        get(urlMatching(resourcePath))
+          .willReturn(aResponse().proxiedFrom(endpointBaseUrl)))
     }
 
     def assertEndpointWasCalled() {

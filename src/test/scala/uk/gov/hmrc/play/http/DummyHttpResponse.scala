@@ -19,6 +19,10 @@ package uk.gov.hmrc.play.http
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.http.HttpResponse
 
-class DummyHttpResponse(override val body: String, override val status: Int, override val allHeaders: Map[String, Seq[String]] = Map.empty) extends HttpResponse {
+class DummyHttpResponse(
+  override val body: String,
+  override val status: Int,
+  override val allHeaders: Map[String, Seq[String]] = Map.empty)
+    extends HttpResponse {
   override def json: JsValue = Json.parse(body)
 }

@@ -31,7 +31,12 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.reflect._
 
-class MdcLoggingExecutionContextSpec extends WordSpecLike with Matchers with LoneElement with Inspectors with BeforeAndAfter {
+class MdcLoggingExecutionContextSpec
+    extends WordSpecLike
+    with Matchers
+    with LoneElement
+    with Inspectors
+    with BeforeAndAfter {
 
   before {
     MDC.clear()
@@ -52,34 +57,32 @@ class MdcLoggingExecutionContextSpec extends WordSpecLike with Matchers with Lon
     //        logList.map(_._2).loneElement should contain(HeaderNames.xRequestId -> "rid")
     //    }
 
-    "capture the an MDC map with values in it and put it in place when a task is run" in withCaptureOfLoggingFrom[MdcLoggingExecutionContextSpec] {
-      logList =>
-        implicit val ec = createAndInitialiseMdcTransportingExecutionContext(Map("someKey" -> "something"))
+    "capture the an MDC map with values in it and put it in place when a task is run" in withCaptureOfLoggingFrom[
+      MdcLoggingExecutionContextSpec] { logList =>
+      implicit val ec = createAndInitialiseMdcTransportingExecutionContext(Map("someKey" -> "something"))
 
-        logEventInsideAFutureUsing(ec)
+      logEventInsideAFutureUsing(ec)
 
-        logList.loneElement._2 should contain("someKey" -> "something")
+      logList.loneElement._2 should contain("someKey" -> "something")
     }
 
-    "ignore an null MDC map" in withCaptureOfLoggingFrom[MdcLoggingExecutionContextSpec] {
-      logList =>
-        implicit val ec = createAndInitialiseMdcTransportingExecutionContext(Map())
+    "ignore an null MDC map" in withCaptureOfLoggingFrom[MdcLoggingExecutionContextSpec] { logList =>
+      implicit val ec = createAndInitialiseMdcTransportingExecutionContext(Map())
 
-        logEventInsideAFutureUsing(ec)
+      logEventInsideAFutureUsing(ec)
 
-        logList.loneElement._2 should be(empty)
+      logList.loneElement._2 should be(empty)
     }
 
-    "clear the MDC map after a task is run" in withCaptureOfLoggingFrom[MdcLoggingExecutionContextSpec] {
-      logList =>
-        implicit val ec = createAndInitialiseMdcTransportingExecutionContext(Map("someKey" -> "something"))
+    "clear the MDC map after a task is run" in withCaptureOfLoggingFrom[MdcLoggingExecutionContextSpec] { logList =>
+      implicit val ec = createAndInitialiseMdcTransportingExecutionContext(Map("someKey" -> "something"))
 
-        doSomethingInsideAFutureButDontLog(ec)
+      doSomethingInsideAFutureButDontLog(ec)
 
-        MDC.clear()
-        logEventInsideAFutureUsing(ec)
+      MDC.clear()
+      logEventInsideAFutureUsing(ec)
 
-        logList.loneElement._2 should be(Map("someKey" -> "something"))
+      logList.loneElement._2 should be(Map("someKey" -> "something"))
     }
 
     "clear the MDC map after a task throws an exception" in withCaptureOfLoggingFrom[MdcLoggingExecutionContextSpec] {
@@ -94,43 +97,43 @@ class MdcLoggingExecutionContextSpec extends WordSpecLike with Matchers with Lon
         logList.loneElement._2 should be(Map("someKey" -> "something"))
     }
 
-    "log values from given MDC map when multiple threads are using it concurrently by ensuring each log from each thread has been logged via MDC" in withCaptureOfLoggingFrom[MdcLoggingExecutionContextSpec] {
-      logList =>
-        val threadCount = 10
-        val logCount = 10
+    "log values from given MDC map when multiple threads are using it concurrently by ensuring each log from each thread has been logged via MDC" in withCaptureOfLoggingFrom[
+      MdcLoggingExecutionContextSpec] { logList =>
+      val threadCount = 10
+      val logCount    = 10
 
-        val concurrentThreadsEc = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(threadCount, new NamedThreadFactory("LoggerThread")))
-        val startLatch = new CountDownLatch(threadCount)
-        val completionLatch = new CountDownLatch(threadCount)
+      val concurrentThreadsEc =
+        ExecutionContext.fromExecutor(Executors.newFixedThreadPool(threadCount, new NamedThreadFactory("LoggerThread")))
+      val startLatch      = new CountDownLatch(threadCount)
+      val completionLatch = new CountDownLatch(threadCount)
 
-        for (t <- 0 until threadCount) {
-          Future {
-            MDC.clear()
-            startLatch.countDown()
-            startLatch.await()
+      for (t <- 0 until threadCount) {
+        Future {
+          MDC.clear()
+          startLatch.countDown()
+          startLatch.await()
 
-            for (l <- 0 until logCount) {
-              val mdc = Map("entry" -> s"${Thread.currentThread().getName}-$l")
-              logEventInsideAFutureUsing(new MdcLoggingExecutionContext(ExecutionContext.global, mdc))
-            }
-
-            completionLatch.countDown()
-          }(concurrentThreadsEc)
-        }
-
-        completionLatch.await()
-
-        val logs = logList.map(_._2).map(_.head._2).toSet
-        logs.size should be(threadCount * logCount)
-
-        for (t <- 1 until threadCount) {
           for (l <- 0 until logCount) {
-            logs should contain(s"LoggerThread-$t-$l")
+            val mdc = Map("entry" -> s"${Thread.currentThread().getName}-$l")
+            logEventInsideAFutureUsing(new MdcLoggingExecutionContext(ExecutionContext.global, mdc))
           }
+
+          completionLatch.countDown()
+        }(concurrentThreadsEc)
+      }
+
+      completionLatch.await()
+
+      val logs = logList.map(_._2).map(_.head._2).toSet
+      logs.size should be(threadCount * logCount)
+
+      for (t <- 1 until threadCount) {
+        for (l <- 0 until logCount) {
+          logs should contain(s"LoggerThread-$t-$l")
         }
+      }
     }
   }
-
 
   def createAndInitialiseMdcTransportingExecutionContext(mdcData: Map[String, String]): MdcLoggingExecutionContext = {
     val ec = new MdcLoggingExecutionContext(ExecutionContext.fromExecutor(Executors.newFixedThreadPool(1)), mdcData)
@@ -154,7 +157,8 @@ class MdcLoggingExecutionContextSpec extends WordSpecLike with Matchers with Lon
 
   def throwAnExceptionInATaskOn(ec: ExecutionContext) {
     ec.execute(new Runnable() {
-      def run(): Unit = throw new RuntimeException("Test what happens when a task running on this EC throws an exception")
+      def run(): Unit =
+        throw new RuntimeException("Test what happens when a task running on this EC throws an exception")
     })
   }
 
@@ -172,9 +176,8 @@ class MdcLoggingExecutionContextSpec extends WordSpecLike with Matchers with Lon
 
       val list = mutable.ListBuffer[(ILoggingEvent, Map[String, String])]()
 
-      override def append(e: ILoggingEvent): Unit = {
+      override def append(e: ILoggingEvent): Unit =
         list.append((e, e.getMDCPropertyMap().asScala.toMap))
-      }
     }
     appender.setContext(logger.getLoggerContext)
     appender.start()

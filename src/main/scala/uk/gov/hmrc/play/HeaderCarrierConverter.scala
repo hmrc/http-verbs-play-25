@@ -25,7 +25,6 @@ import scala.util.Try
 
 object HeaderCarrierConverter {
 
-
   def fromHeadersAndSession(headers: Headers, session: Option[Session] = None) = {
     lazy val cookies: Cookies = Cookies.fromCookieHeader(headers.get(play.api.http.HeaderNames.COOKIE))
     session.fold(fromHeaders(headers)) {
@@ -33,16 +32,14 @@ object HeaderCarrierConverter {
     }
   }
 
-  def whitelistedHeaders: Seq[String] = {
+  def whitelistedHeaders: Seq[String] =
     Play.maybeApplication.flatMap(_.configuration.getStringSeq("httpHeadersWhitelist")).getOrElse(Seq())
-  }
 
-  def buildRequestChain(currentChain: Option[String]): RequestChain = {
+  def buildRequestChain(currentChain: Option[String]): RequestChain =
     currentChain match {
-      case None => RequestChain.init
+      case None        => RequestChain.init
       case Some(chain) => RequestChain(chain).extend
     }
-  }
 
   def requestTimestamp(headers: Headers): Long =
     headers
@@ -50,11 +47,13 @@ object HeaderCarrierConverter {
       .flatMap(tsAsString => Try(tsAsString.toLong).toOption)
       .getOrElse(System.nanoTime())
 
-  private def getSessionId(s: Session, headers: Headers) = s.get(SessionKeys.sessionId).fold[Option[String]](headers.get(HeaderNames.xSessionId))(Some(_))
+  private def getSessionId(s: Session, headers: Headers) =
+    s.get(SessionKeys.sessionId).fold[Option[String]](headers.get(HeaderNames.xSessionId))(Some(_))
 
-  private def getDeviceId(c: Cookies, headers: Headers) = c.get(CookieNames.deviceID).map(_.value).fold[Option[String]](headers.get(HeaderNames.deviceID))(Some(_))
+  private def getDeviceId(c: Cookies, headers: Headers) =
+    c.get(CookieNames.deviceID).map(_.value).fold[Option[String]](headers.get(HeaderNames.deviceID))(Some(_))
 
-  private def fromHeaders(headers: Headers): HeaderCarrier = {
+  private def fromHeaders(headers: Headers): HeaderCarrier =
     HeaderCarrier(
       headers.get(HeaderNames.authorisation).map(Authorization),
       None,
@@ -73,9 +72,8 @@ object HeaderCarrierConverter {
       headers.get(HeaderNames.akamaiReputation).map(AkamaiReputation),
       otherHeaders(headers)
     )
-  }
 
-  private def fromSession(headers: Headers, cookies: Cookies, s: Session): HeaderCarrier = {
+  private def fromSession(headers: Headers, cookies: Cookies, s: Session): HeaderCarrier =
     HeaderCarrier(
       s.get(SessionKeys.authToken).map(Authorization),
       s.get(SessionKeys.userId).map(UserId),
@@ -94,22 +92,19 @@ object HeaderCarrierConverter {
       headers.get(HeaderNames.akamaiReputation).map(AkamaiReputation),
       otherHeaders(headers)
     )
-  }
 
   private def otherHeaders(headers: Headers): Seq[(String, String)] = {
-    val remaining = headers.keys.
-      filterNot(HeaderNames.explicitlyIncludedHeaders.contains(_)).
-      filter(whitelistedHeaders.contains(_))
+    val remaining =
+      headers.keys.filterNot(HeaderNames.explicitlyIncludedHeaders.contains(_)).filter(whitelistedHeaders.contains(_))
     remaining.map(h => h -> headers.get(h).getOrElse("")).toSeq
   }
 
-  private def forwardedFor(headers: Headers): Option[ForwardedFor] = {
+  private def forwardedFor(headers: Headers): Option[ForwardedFor] =
     ((headers.get(HeaderNames.trueClientIp), headers.get(HeaderNames.xForwardedFor)) match {
-      case (tcip, None) => tcip
-      case (None | Some(""), xff) => xff
+      case (tcip, None)                                    => tcip
+      case (None | Some(""), xff)                          => xff
       case (Some(tcip), Some(xff)) if xff.startsWith(tcip) => Some(xff)
-      case (Some(tcip), Some(xff)) => Some(s"$tcip, $xff")
+      case (Some(tcip), Some(xff))                         => Some(s"$tcip, $xff")
     }).map(ForwardedFor)
-  }
 
 }

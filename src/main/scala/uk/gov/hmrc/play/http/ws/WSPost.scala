@@ -22,24 +22,26 @@ import uk.gov.hmrc.http._
 
 import scala.concurrent.Future
 
-
 trait WSPost extends CorePost with PostHttpTransport with WSRequest {
 
-
-  override def doPost[A](url: String, body: A, headers: Seq[(String,String)])(implicit rds: Writes[A], hc: HeaderCarrier): Future[HttpResponse] = {
+  override def doPost[A](url: String, body: A, headers: Seq[(String, String)])(
+    implicit rds: Writes[A],
+    hc: HeaderCarrier): Future[HttpResponse] = {
 
     import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
     buildRequest(url).withHeaders(headers: _*).post(Json.toJson(body)).map(new WSHttpResponse(_))
   }
 
-  override def doFormPost(url: String, body: Map[String,Seq[String]])(implicit hc: HeaderCarrier): Future[HttpResponse] = {
+  override def doFormPost(url: String, body: Map[String, Seq[String]])(
+    implicit hc: HeaderCarrier): Future[HttpResponse] = {
     import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
     buildRequest(url).post(body).map(new WSHttpResponse(_))
   }
 
-  override def doPostString(url: String, body: String, headers: Seq[(String,String)])(implicit hc: HeaderCarrier): Future[HttpResponse] = {
+  override def doPostString(url: String, body: String, headers: Seq[(String, String)])(
+    implicit hc: HeaderCarrier): Future[HttpResponse] = {
     import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
     buildRequest(url).withHeaders(headers: _*).post(body).map(new WSHttpResponse(_))

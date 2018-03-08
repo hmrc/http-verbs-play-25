@@ -33,23 +33,20 @@ trait WSRequest extends Request {
     WS.client
   }
 
-  def buildRequest[A](url: String)(implicit hc: HeaderCarrier): ws.WSRequest = {
+  def buildRequest[A](url: String)(implicit hc: HeaderCarrier): ws.WSRequest =
     wsClient.url(url).withHeaders(applicableHeaders(url)(hc): _*)
-  }
 
 }
-
 
 trait WSProxy extends WSRequest {
 
   def wsProxyServer: Option[WSProxyServer]
 
-  override def buildRequest[A](url: String)(implicit hc: HeaderCarrier): ws.WSRequest = {
+  override def buildRequest[A](url: String)(implicit hc: HeaderCarrier): ws.WSRequest =
     wsProxyServer match {
       case Some(proxy) => super.buildRequest(url).withProxyServer(proxy)
-      case None => super.buildRequest(url)
+      case None        => super.buildRequest(url)
     }
-  }
 }
 
 object WSProxyConfiguration {
@@ -67,16 +64,17 @@ object WSProxyConfiguration {
 
   }
 
-  private def parseProxyConfiguration(configPrefix: String, configuration: Configuration) = {
+  private def parseProxyConfiguration(configPrefix: String, configuration: Configuration) =
     DefaultWSProxyServer(
-      protocol = configuration.getString(s"$configPrefix.protocol").orElse(throw ProxyConfigurationException("protocol")),
-      host = configuration.getString(s"$configPrefix.host").getOrElse(throw ProxyConfigurationException("host")),
-      port = configuration.getInt(s"$configPrefix.port").getOrElse(throw ProxyConfigurationException("port")),
+      protocol =
+        configuration.getString(s"$configPrefix.protocol").orElse(throw ProxyConfigurationException("protocol")),
+      host      = configuration.getString(s"$configPrefix.host").getOrElse(throw ProxyConfigurationException("host")),
+      port      = configuration.getInt(s"$configPrefix.port").getOrElse(throw ProxyConfigurationException("port")),
       principal = configuration.getString(s"$configPrefix.username"),
-      password = configuration.getString(s"$configPrefix.password")
+      password  = configuration.getString(s"$configPrefix.password")
     )
-  }
 
-  case class ProxyConfigurationException(key: String) extends RuntimeException(s"Missing proxy configuration - key '$key' not found")
+  case class ProxyConfigurationException(key: String)
+      extends RuntimeException(s"Missing proxy configuration - key '$key' not found")
 
 }
