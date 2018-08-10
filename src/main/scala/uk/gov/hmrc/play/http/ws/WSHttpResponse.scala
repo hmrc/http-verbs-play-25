@@ -24,7 +24,7 @@ class WSHttpResponse(wsResponse: WSResponse) extends HttpResponse {
 
   override def status = wsResponse.status
 
-  override def json = wsResponse.json
+  def json = wsResponse.json
 
   override def body = wsResponse.body
 }

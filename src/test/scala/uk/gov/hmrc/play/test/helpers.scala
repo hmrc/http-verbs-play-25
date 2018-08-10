@@ -38,7 +38,7 @@ trait TestHttpCore extends CorePost with CoreGet with CorePut with CorePatch wit
   override def applicableHeaders(url: String)(implicit hc: HeaderCarrier): Seq[(String, String)] = Nil
 
   override def POST[I, O](url: String, body: I, headers: Seq[(String, String)])(
-    implicit wts: Writes[I],
+    implicit wts: HttpWrites[I],
     rds: HttpReads[O],
     hc: HeaderCarrier,
     ec: ExecutionContext): Future[O] = ???
@@ -65,11 +65,11 @@ trait TestHttpCore extends CorePost with CoreGet with CorePut with CorePatch wit
 
   override def PUT[I, O](
     url: String,
-    body: I)(implicit wts: Writes[I], rds: HttpReads[O], hc: HeaderCarrier, ec: ExecutionContext): Future[O] = ???
+    body: I)(implicit wts: HttpWrites[I], rds: HttpReads[O], hc: HeaderCarrier, ec: ExecutionContext): Future[O] = ???
 
   override def PATCH[I, O](
     url: String,
-    body: I)(implicit wts: Writes[I], rds: HttpReads[O], hc: HeaderCarrier, ec: ExecutionContext): Future[O] = ???
+    body: I)(implicit wts: HttpWrites[I], rds: HttpReads[O], hc: HeaderCarrier, ec: ExecutionContext): Future[O] = ???
 
   override def DELETE[O](url: String)(implicit rds: HttpReads[O], hc: HeaderCarrier, ec: ExecutionContext): Future[O] =
     ???

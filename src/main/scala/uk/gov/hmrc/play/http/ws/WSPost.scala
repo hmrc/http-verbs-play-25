@@ -25,12 +25,12 @@ import scala.concurrent.Future
 trait WSPost extends CorePost with PostHttpTransport with WSRequest {
 
   override def doPost[A](url: String, body: A, headers: Seq[(String, String)])(
-    implicit rds: Writes[A],
+    implicit wts: HttpWrites[A],
     hc: HeaderCarrier): Future[HttpResponse] = {
 
     import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-    buildRequest(url).withHeaders(headers: _*).post(Json.toJson(body)).map(new WSHttpResponse(_))
+    buildRequest(url).withHeaders(headers: _*).post(wts.write(body)).map(new WSHttpResponse(_))
   }
 
   override def doFormPost(url: String, body: Map[String, Seq[String]])(

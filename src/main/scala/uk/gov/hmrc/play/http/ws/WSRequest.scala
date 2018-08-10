@@ -26,7 +26,7 @@ trait WSRequest extends Request {
 
   import play.api.libs.ws.WS
 
-  override lazy val configuration: Option[Config] = Play.maybeApplication.map(_.configuration.underlying)
+  //override lazy val configuration: Option[Config] = Play.maybeApplication.map(_.configuration.underlying)
 
   def wsClient: WSClient = {
     import play.api.Play.current
