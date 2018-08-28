@@ -160,6 +160,16 @@ class HeaderCarrierSpec extends WordSpecLike with Matchers {
         .otherHeaders shouldBe Seq("quix" -> "foo")
     }
 
+
+    "whitelisted headers check should be case insensitive" in running(
+      FakeApplication(additionalConfiguration = Map("httpHeadersWhitelist" -> Seq("x-client-id")))) {
+      HeaderCarrierConverter
+        .fromHeadersAndSession(
+          headers(HeaderNames.xRequestId -> "18476239874162", "User-Agent" -> "quix", "X-Client-ID" -> "foo"),
+          Some(Session()))
+        .otherHeaders shouldBe Seq("X-Client-ID" -> "foo")
+    }
+
   }
 
   "build Google Analytics headers from request" should {

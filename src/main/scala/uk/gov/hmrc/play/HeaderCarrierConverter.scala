@@ -95,7 +95,9 @@ object HeaderCarrierConverter {
 
   private def otherHeaders(headers: Headers): Seq[(String, String)] = {
     val remaining =
-      headers.keys.filterNot(HeaderNames.explicitlyIncludedHeaders.contains(_)).filter(whitelistedHeaders.contains(_))
+      headers.keys
+        .filterNot(HeaderNames.explicitlyIncludedHeaders.contains(_))
+        .filter(h => whitelistedHeaders.map(_.toLowerCase).contains(h.toLowerCase))
     remaining.map(h => h -> headers.get(h).getOrElse("")).toSeq
   }
 
