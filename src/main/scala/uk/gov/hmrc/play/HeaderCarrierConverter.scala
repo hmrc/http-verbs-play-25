@@ -17,7 +17,7 @@
 package uk.gov.hmrc.play
 
 import play.api.Play
-import play.api.mvc.{Cookies, Headers, Session}
+import play.api.mvc.{Cookies, Headers, RequestHeader, Session}
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.logging._
 
@@ -26,9 +26,13 @@ import scala.util.Try
 object HeaderCarrierConverter {
 
   def fromHeadersAndSession(headers: Headers, session: Option[Session] = None) = {
+    fromHeadersAndSessionAndRequest(headers, session, None)
+  }
+
+  def fromHeadersAndSessionAndRequest(headers: Headers, session: Option[Session] = None, request: Option[RequestHeader] = None) = {
     lazy val cookies: Cookies = Cookies.fromCookieHeader(headers.get(play.api.http.HeaderNames.COOKIE))
-    session.fold(fromHeaders(headers)) {
-      fromSession(headers, cookies, _)
+    session.fold(fromHeaders(headers, request)) {
+      fromSession(headers, cookies, request, _)
     }
   }
 
@@ -47,13 +51,15 @@ object HeaderCarrierConverter {
       .flatMap(tsAsString => Try(tsAsString.toLong).toOption)
       .getOrElse(System.nanoTime())
 
+  val Path = "path"
+
   private def getSessionId(s: Session, headers: Headers) =
     s.get(SessionKeys.sessionId).fold[Option[String]](headers.get(HeaderNames.xSessionId))(Some(_))
 
   private def getDeviceId(c: Cookies, headers: Headers) =
     c.get(CookieNames.deviceID).map(_.value).fold[Option[String]](headers.get(HeaderNames.deviceID))(Some(_))
 
-  private def fromHeaders(headers: Headers): HeaderCarrier =
+  private def fromHeaders(headers: Headers, requestHeader: Option[RequestHeader]): HeaderCarrier =
     HeaderCarrier(
       headers.get(HeaderNames.authorisation).map(Authorization),
       None,
@@ -70,10 +76,10 @@ object HeaderCarrierConverter {
       headers.get(HeaderNames.googleAnalyticUserId),
       headers.get(HeaderNames.deviceID),
       headers.get(HeaderNames.akamaiReputation).map(AkamaiReputation),
-      otherHeaders(headers)
+      otherHeaders(headers, requestHeader)
     )
 
-  private def fromSession(headers: Headers, cookies: Cookies, s: Session): HeaderCarrier =
+  private def fromSession(headers: Headers, cookies: Cookies, requestHeader: Option[RequestHeader], s: Session): HeaderCarrier =
     HeaderCarrier(
       s.get(SessionKeys.authToken).map(Authorization),
       s.get(SessionKeys.userId).map(UserId),
@@ -90,15 +96,17 @@ object HeaderCarrierConverter {
       headers.get(HeaderNames.googleAnalyticUserId),
       getDeviceId(cookies, headers),
       headers.get(HeaderNames.akamaiReputation).map(AkamaiReputation),
-      otherHeaders(headers)
+      otherHeaders(headers, requestHeader)
     )
 
-  private def otherHeaders(headers: Headers): Seq[(String, String)] = {
+  private def otherHeaders(headers: Headers, requestHeader: Option[RequestHeader]): Seq[(String, String)] = {
     val remaining =
       headers.keys
         .filterNot(HeaderNames.explicitlyIncludedHeaders.contains(_))
         .filter(h => whitelistedHeaders.map(_.toLowerCase).contains(h.toLowerCase))
-    remaining.map(h => h -> headers.get(h).getOrElse("")).toSeq
+    remaining.map(h => h -> headers.get(h).getOrElse("")).toSeq ++
+      //adding path so that play-auditing can access the request path without a dependency on play
+      requestHeader.map(rh => Path -> rh.path)
   }
 
   private def forwardedFor(headers: Headers): Option[ForwardedFor] =
