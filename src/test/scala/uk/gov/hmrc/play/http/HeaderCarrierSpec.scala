@@ -170,6 +170,15 @@ class HeaderCarrierSpec extends WordSpecLike with Matchers {
         .otherHeaders shouldBe Seq("X-Client-ID" -> "foo")
     }
 
+    "add the request path" in running(FakeApplication()) {
+      HeaderCarrierConverter
+        .fromHeadersAndSessionAndRequest(
+          headers(),
+          request = Some(new DummyRequestHeader() { override def path ="/the/request/path"} )
+        )
+        .otherHeaders shouldBe Seq("path" -> "/the/request/path")
+    }
+
   }
 
   "build Google Analytics headers from request" should {
