@@ -3,6 +3,9 @@ http-verbs-play-25
 
 [![Build Status](https://travis-ci.org/hmrc/http-verbs-play-25 .svg)](https://travis-ci.org/hmrc/http-verbs-play-25 ) [ ![Download](https://api.bintray.com/packages/hmrc/releases/http-verbs-play-25 /images/download.svg) ](https://bintray.com/hmrc/releases/http-verbs-play-25 /_latestVersion)
 
+## This library is deprecated
+### All classes from this library have been copied to http-verbs starting from version 8.5.0. Some time ago http-verbs was split into three libraries: http-core (meant to be play-independent), http-verbs (play independent) and http-verbs-play-25 (with a dependency on play). Unfortunately http-core still contained play-json which is not binary compatibile between play 2.5 and 2.6. This means that libraries compiled against http-core could fail at runtime when used with a microservice using play 2.6. A decision was made to collapse all the classess from http-core, http-verbs and http-verbs-play-25 and only keep one single library: http-verbs. It will be available for both Play 2.5 and Play 2.6.
+
 http-verbs-play-25 is a Scala library providing concrete implementation of [hrmc/http-core](https://github.com/hmrc/http-core) for making asynchronous HTTP calls. The underlying implementation uses [Play 2.5 WS](https://www.playframework.com/documentation/2.5.x/ScalaWS).
 
 It encapsulates some common concerns for calling other HTTP services on the HMRC Tax Platform, including:
