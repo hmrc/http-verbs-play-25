@@ -14,19 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.play.http.ws
+package uk.gov.hmrc.play
 
-import play.api.libs.json.{Json, Writes}
-import uk.gov.hmrc.http._
-
-import scala.concurrent.Future
-
-trait WSPatch extends CorePatch with PatchHttpTransport with WSRequest {
-
-  override def doPatch[A](url: String, body: A)(implicit rds: Writes[A], hc: HeaderCarrier): Future[HttpResponse] = {
-    import play.api.libs.concurrent.Execution.Implicits.defaultContext
-
-    buildRequest(url).patch(Json.toJson(body)).map(new WSHttpResponse(_))
-  }
-
-}
+/*
+ *  http-verbs-play-25 has been merged into http-verbs
+ */
+private class HttpVerbsPlay25NoLongerNeeded
